@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Trent Blackburn's Blog</title><link>https://tablackburn.github.io/</link><description>Recent content on Trent Blackburn's Blog</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Wed, 06 Aug 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://tablackburn.github.io/index.xml" rel="self" type="application/rss+xml"/><item><title>Announcing ScheduledTasksManager: A New PowerShell Module for Cluster-Aware Task Management</title><link>https://tablackburn.github.io/p/announcing-scheduledtasksmanager-powershell-module/</link><pubDate>Wed, 06 Aug 2025 00:00:00 +0000</pubDate><guid>https://tablackburn.github.io/p/announcing-scheduledtasksmanager-powershell-module/</guid><description>&lt;p>I&amp;rsquo;m excited to announce the release of my first PowerShell module:
+&lt;strong>ScheduledTasksManager v0.1.0&lt;/strong>! This module is now available on the
+&lt;a class="link" href="https://www.powershellgallery.com/packages/ScheduledTasksManager/" target="_blank" rel="noopener"
+>PowerShell Gallery&lt;/a>
+and addresses a real challenge I&amp;rsquo;ve encountered in enterprise environments.&lt;/p>
+&lt;h2 id="the-problem">The Problem
+&lt;/h2>&lt;p>Managing scheduled tasks in Windows Server Failover Clusters can be complex and
+error-prone. The built-in &lt;code>ScheduledTasks&lt;/code> module from Microsoft works great for
+standalone systems, but when you&amp;rsquo;re dealing with clustered environments, you need
+additional functionality to handle tasks across multiple nodes effectively.&lt;/p>
+&lt;h2 id="the-solution">The Solution
+&lt;/h2>&lt;p>ScheduledTasksManager extends the capabilities of Microsoft&amp;rsquo;s built-in module with
+cluster-aware functionality. It provides comprehensive functions for managing
+scheduled tasks in both standalone and clustered Windows environments.&lt;/p>
+&lt;h3 id="key-features">Key Features
+&lt;/h3>&lt;ul>
+&lt;li>&lt;strong>Cluster-Aware Operations&lt;/strong>: Register, enable, disable, start, and monitor
+scheduled tasks across failover cluster nodes&lt;/li>
+&lt;li>&lt;strong>Advanced Monitoring&lt;/strong>: Retrieve detailed task information, run history, and
+cluster node details&lt;/li>
+&lt;li>&lt;strong>Configuration Management&lt;/strong>: Export and import task configurations for backup
+and deployment scenarios&lt;/li>
+&lt;li>&lt;strong>Smart Filtering&lt;/strong>: Filter tasks by state, type, and ownership across cluster nodes&lt;/li>
+&lt;li>&lt;strong>Secure Authentication&lt;/strong>: Built-in support for credential management and CIM sessions&lt;/li>
+&lt;/ul>
+&lt;h2 id="quick-start">Quick Start
+&lt;/h2>&lt;p>Getting started is simple:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-powershell" data-lang="powershell">&lt;span class="line">&lt;span class="cl">&lt;span class="c"># Install from PowerShell Gallery&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">Install-Module&lt;/span> &lt;span class="n">-Name&lt;/span> &lt;span class="n">ScheduledTasksManager&lt;/span> &lt;span class="n">-Repository&lt;/span> &lt;span class="n">PSGallery&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c"># Import the module&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">Import-Module&lt;/span> &lt;span class="n">ScheduledTasksManager&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c"># Get all clustered scheduled tasks&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">Get-StmClusteredScheduledTask&lt;/span> &lt;span class="n">-Cluster&lt;/span> &lt;span class="s2">&amp;#34;MyCluster&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c"># Register a new clustered task&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">Register-StmClusteredScheduledTask&lt;/span> &lt;span class="n">-Cluster&lt;/span> &lt;span class="s2">&amp;#34;MyCluster&amp;#34;&lt;/span> &lt;span class="n">-TaskName&lt;/span> &lt;span class="s2">&amp;#34;BackupTask&amp;#34;&lt;/span> &lt;span class="n">-TaskType&lt;/span> &lt;span class="s2">&amp;#34;ClusterWide&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="whats-included">What&amp;rsquo;s Included
+&lt;/h2>&lt;p>The module includes 11 comprehensive functions:&lt;/p>
+&lt;ul>
+&lt;li>Task retrieval and information gathering&lt;/li>
+&lt;li>Task registration and removal&lt;/li>
+&lt;li>Task state management (enable/disable)&lt;/li>
+&lt;li>Manual task execution and monitoring&lt;/li>
+&lt;li>Configuration export capabilities&lt;/li>
+&lt;/ul>
+&lt;p>Each function includes detailed help documentation and practical examples.&lt;/p>
+&lt;h2 id="enterprise-ready">Enterprise Ready
+&lt;/h2>&lt;p>ScheduledTasksManager is designed for enterprise environments with features like:&lt;/p>
+&lt;ul>
+&lt;li>Credential delegation support&lt;/li>
+&lt;li>Comprehensive error handling&lt;/li>
+&lt;li>Standardized PowerShell function patterns&lt;/li>
+&lt;li>Built-in validation for cluster operations&lt;/li>
+&lt;/ul>
+&lt;h2 id="looking-forward">Looking Forward
+&lt;/h2>&lt;p>This initial release (v0.1.0) establishes the foundation for cluster-aware scheduled
+task management. I&amp;rsquo;m already planning additional features and improvements based on
+community feedback.&lt;/p>
+&lt;h2 id="get-involved">Get Involved
+&lt;/h2>&lt;ul>
+&lt;li>&lt;strong>Download&lt;/strong>: Available now on &lt;a class="link" href="https://www.powershellgallery.com/packages/ScheduledTasksManager/" target="_blank" rel="noopener"
+>PowerShell Gallery&lt;/a>&lt;/li>
+&lt;li>&lt;strong>Documentation&lt;/strong>: Complete documentation at &lt;a class="link" href="https://tablackburn.github.io/ScheduledTasksManager/" target="_blank" rel="noopener"
+>tablackburn.github.io/ScheduledTasksManager&lt;/a>&lt;/li>
+&lt;li>&lt;strong>Source Code&lt;/strong>: View the source and contribute on &lt;a class="link" href="https://github.com/tablackburn/ScheduledTasksManager" target="_blank" rel="noopener"
+>GitHub&lt;/a>&lt;/li>
+&lt;li>&lt;strong>Issues &amp;amp; Feedback&lt;/strong>: Report bugs or request features through &lt;a class="link" href="https://github.com/tablackburn/ScheduledTasksManager/issues" target="_blank" rel="noopener"
+>GitHub Issues&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>I hope this module helps simplify your scheduled task management in clustered
+environments. Give it a try and let me know what you think!&lt;/p></description></item><item><title>Archives</title><link>https://tablackburn.github.io/archives/</link><pubDate>Sun, 06 Mar 2022 00:00:00 +0000</pubDate><guid>https://tablackburn.github.io/archives/</guid><description/></item><item><title>Links</title><link>https://tablackburn.github.io/links/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://tablackburn.github.io/links/</guid><description>&lt;p>To use this feature, add &lt;code>links&lt;/code> section to frontmatter.&lt;/p>
+&lt;p>This page&amp;rsquo;s frontmatter:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;span class="lnt">9
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">links&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">title&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">GitHub&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">description&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">GitHub is the world&amp;#39;s largest software development platform.&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">website&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">https://github.com&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">image&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">title&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">TypeScript&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">description&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">TypeScript is a typed superset of JavaScript that compiles to plain JavaScript.&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">website&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">https://www.typescriptlang.org&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">image&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">ts-logo-128.jpg&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;code>image&lt;/code> field accepts both local and external images.&lt;/p></description></item><item><title>Search</title><link>https://tablackburn.github.io/search/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://tablackburn.github.io/search/</guid><description/></item></channel></rss>
