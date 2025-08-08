@@ -15,6 +15,7 @@ lastUpdated = "Aug 08, 2025 11:17 EST"
 [sidebar]
 emoji = "🍥"
 subtitle = "PowerShell, Automation, and DevOps"
+compact = false
 
 [sidebar.avatar]
 enabled = true
