@@ -19,6 +19,3 @@ icon = "brand-github"
 identifier = "linkedin"
 name = "LinkedIn"
 url = "https://www.linkedin.com/in/trentblackburn/"
-
-[social.params]
-icon = "brand-linkedin"
