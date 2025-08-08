@@ -16,6 +16,3 @@ disqusShortname = "hugo-theme-stack"
 
 [pagination]
 pagerSize = 5
-
-[[module.imports]]
-path = "github.com/hugo-mods/icons"
