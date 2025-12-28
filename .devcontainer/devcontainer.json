@@ -24,8 +24,8 @@
 		1313
 	],
 
-	// Use 'postCreateCommand' to run commands after the container is created.
-	// "postCreateCommand": "uname -a",
+	// Use 'postStartCommand' to run commands after the container starts.
+	"postStartCommand": "npm install -D markdownlint-cli2",
 
 	// Set `remoteUser` to `root` to connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
 	"remoteUser": "root"

@@ -1,0 +1,12 @@
+{
+  "name": "tablackburn-github-io",
+  "version": "1.0.0",
+  "description": "Personal blog site",
+  "scripts": {
+    "lint:md": "markdownlint-cli2 'content/**/*.md'"
+  },
+  "devDependencies": {
+    "markdownlint-cli2": "^0.20.0"
+  }
+}
+

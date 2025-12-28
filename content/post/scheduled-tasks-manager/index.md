@@ -8,7 +8,6 @@ tags: ["PowerShell", "ScheduledTasks", "Clustering", "Windows Server", "Automati
 categories: ["PowerShell", "Windows Server", "DevOps"]
 params:
   author1: "Trent Blackburn"
-  microsoft_alias: "trblackburn"
   featured_image: ""
   ai_note: "AI was used to help structure and format this blog post announcement"
 ---
@@ -39,8 +38,10 @@ scheduled tasks in both standalone and clustered Windows environments.
   cluster node details
 - **Configuration Management**: Export and import task configurations for backup
   and deployment scenarios
-- **Smart Filtering**: Filter tasks by state, type, and ownership across cluster nodes
-- **Secure Authentication**: Built-in support for credential management and CIM sessions
+  - **Smart Filtering**: Filter tasks by state, type, and ownership across
+    cluster nodes
+  - **Secure Authentication**: Built-in support for credential management and
+    CIM sessions
 
 ## Quick Start
 
@@ -57,7 +58,9 @@ Import-Module ScheduledTasksManager
 Get-StmClusteredScheduledTask -Cluster "MyCluster"
 
 # Register a new clustered task
-Register-StmClusteredScheduledTask -Cluster "MyCluster" -TaskName "BackupTask" -TaskType "ClusterWide"
+  Register-StmClusteredScheduledTask -Cluster "MyCluster" `
+    -TaskName "BackupTask" `
+    -TaskType "ClusterWide"
 ```
 
 ## What's Included
@@ -83,9 +86,9 @@ ScheduledTasksManager is designed for enterprise environments with features like
 
 ## Looking Forward
 
-This initial release (v0.1.0) establishes the foundation for cluster-aware scheduled
-task management. I'm already planning additional features and improvements based on
-community feedback.
+  This initial release (v0.1.0) establishes the foundation for cluster-aware
+  scheduled task management. I'm already planning additional features and
+  improvements based on community feedback.
 
 ## Get Involved
 
