@@ -2,6 +2,8 @@
 
 # Hugo Theme Stack Starter Template
 
+[![AI Assisted](https://img.shields.io/badge/AI-Assisted-blue)](https://claude.ai)
+
 This is a quick start template for [Hugo theme Stack](https://github.com/CaiJimmy/hugo-theme-stack). It uses [Hugo modules](https://gohugo.io/hugo-modules/) feature to load the theme.
 
 It comes with a basic theme structure and configuration. GitHub action has been set up to deploy the theme to a public GitHub page automatically. Also, there's a cron job to update the theme automatically everyday.
@@ -67,3 +69,7 @@ Make sure also to specify Hugo version in the environment variable `HUGO_VERSION
 
 ![Environment variable](https://user-images.githubusercontent.com/5889006/156917212-afb7c70d-ab85-480f-8288-b15781a462c0.png)
 </details>
+
+## Acknowledgments
+
+This project was developed with assistance from [Claude](https://claude.ai) by Anthropic.
