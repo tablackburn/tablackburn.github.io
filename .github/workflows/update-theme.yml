@@ -26,6 +26,14 @@ jobs:
           hugo-version: 0.123.8
           extended: true
 
+      - name: Show Hugo version and which
+        run: |
+          hugo version
+          which hugo
+
+      - name: Clean Hugo module cache
+        run: rm -rf ~/.cache/hugo_cache
+
       - name: Update theme
         run: hugo mod get -u github.com/CaiJimmy/hugo-theme-stack/v3
 
