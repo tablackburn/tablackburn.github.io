@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>PowerShell on Trent Blackburn's Blog</title><link>https://tablackburn.github.io/categories/powershell/</link><description>Recent content in PowerShell on Trent Blackburn's Blog</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Wed, 06 Aug 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://tablackburn.github.io/categories/powershell/index.xml" rel="self" type="application/rss+xml"/><item><title>Announcing ScheduledTasksManager: A New PowerShell Module for Cluster-Aware Task Management</title><link>https://tablackburn.github.io/p/announcing-scheduledtasksmanager-powershell-module/</link><pubDate>Wed, 06 Aug 2025 00:00:00 +0000</pubDate><guid>https://tablackburn.github.io/p/announcing-scheduledtasksmanager-powershell-module/</guid><description>&lt;p&gt;I&amp;rsquo;m excited to announce the release of my first PowerShell module:
+&lt;strong&gt;ScheduledTasksManager v0.1.0&lt;/strong&gt;! This module is now available on the
+&lt;a class="link" href="https://www.powershellgallery.com/packages/ScheduledTasksManager/" target="_blank" rel="noopener"
+&gt;PowerShell Gallery&lt;/a&gt;
+and addresses a real challenge I&amp;rsquo;ve encountered in enterprise environments.&lt;/p&gt;
+&lt;h2 id="the-problem"&gt;The Problem
+&lt;/h2&gt;&lt;p&gt;Managing scheduled tasks in Windows Server Failover Clusters can be complex and
+error-prone. The built-in &lt;code&gt;ScheduledTasks&lt;/code&gt; module from Microsoft works great for
+standalone systems, but when you&amp;rsquo;re dealing with clustered environments, you need
+additional functionality to handle tasks across multiple nodes effectively.&lt;/p&gt;
+&lt;h2 id="the-solution"&gt;The Solution
+&lt;/h2&gt;&lt;p&gt;ScheduledTasksManager extends the capabilities of Microsoft&amp;rsquo;s built-in module with
+cluster-aware functionality. It provides comprehensive functions for managing
+scheduled tasks in both standalone and clustered Windows environments.&lt;/p&gt;
+&lt;h3 id="key-features"&gt;Key Features
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Cluster-Aware Operations&lt;/strong&gt;: Register, enable, disable, start, and monitor
+scheduled tasks across failover cluster nodes&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Advanced Monitoring&lt;/strong&gt;: Retrieve detailed task information, run history, and
+cluster node details&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Configuration Management&lt;/strong&gt;: Export and import task configurations for backup
+and deployment scenarios
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Smart Filtering&lt;/strong&gt;: Filter tasks by state, type, and ownership across
+cluster nodes&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Secure Authentication&lt;/strong&gt;: Built-in support for credential management and
+CIM sessions&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="quick-start"&gt;Quick Start
+&lt;/h2&gt;&lt;p&gt;Getting started is simple:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;span class="lnt"&gt;12
+&lt;/span&gt;&lt;span class="lnt"&gt;13
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-powershell" data-lang="powershell"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c"&gt;# Install from PowerShell Gallery&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nb"&gt;Install-Module&lt;/span&gt; &lt;span class="n"&gt;-Name&lt;/span&gt; &lt;span class="n"&gt;ScheduledTasksManager&lt;/span&gt; &lt;span class="n"&gt;-Repository&lt;/span&gt; &lt;span class="n"&gt;PSGallery&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c"&gt;# Import the module&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nb"&gt;Import-Module&lt;/span&gt; &lt;span class="n"&gt;ScheduledTasksManager&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c"&gt;# Get all clustered scheduled tasks&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nb"&gt;Get-StmClusteredScheduledTask&lt;/span&gt; &lt;span class="n"&gt;-Cluster&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;MyCluster&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c"&gt;# Register a new clustered task&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nb"&gt;Register-StmClusteredScheduledTask&lt;/span&gt; &lt;span class="n"&gt;-Cluster&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;MyCluster&amp;#34;&lt;/span&gt; &lt;span class="p"&gt;`&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;-TaskName&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;BackupTask&amp;#34;&lt;/span&gt; &lt;span class="p"&gt;`&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;-TaskType&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;ClusterWide&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id="whats-included"&gt;What&amp;rsquo;s Included
+&lt;/h2&gt;&lt;p&gt;The module includes 11 comprehensive functions:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Task retrieval and information gathering&lt;/li&gt;
+&lt;li&gt;Task registration and removal&lt;/li&gt;
+&lt;li&gt;Task state management (enable/disable)&lt;/li&gt;
+&lt;li&gt;Manual task execution and monitoring&lt;/li&gt;
+&lt;li&gt;Configuration export capabilities&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Each function includes detailed help documentation and practical examples.&lt;/p&gt;
+&lt;h2 id="enterprise-ready"&gt;Enterprise Ready
+&lt;/h2&gt;&lt;p&gt;ScheduledTasksManager is designed for enterprise environments with features like:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Credential delegation support&lt;/li&gt;
+&lt;li&gt;Comprehensive error handling&lt;/li&gt;
+&lt;li&gt;Standardized PowerShell function patterns&lt;/li&gt;
+&lt;li&gt;Built-in validation for cluster operations&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="looking-forward"&gt;Looking Forward
+&lt;/h2&gt;&lt;p&gt;This initial release (v0.1.0) establishes the foundation for cluster-aware
+scheduled task management. I&amp;rsquo;m already planning additional features and
+improvements based on community feedback.&lt;/p&gt;
+&lt;h2 id="get-involved"&gt;Get Involved
+&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Download&lt;/strong&gt;: Available now on &lt;a class="link" href="https://www.powershellgallery.com/packages/ScheduledTasksManager/" target="_blank" rel="noopener"
+&gt;PowerShell Gallery&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Documentation&lt;/strong&gt;: Complete documentation at &lt;a class="link" href="https://tablackburn.github.io/ScheduledTasksManager/" target="_blank" rel="noopener"
+&gt;tablackburn.github.io/ScheduledTasksManager&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Source Code&lt;/strong&gt;: View the source and contribute on &lt;a class="link" href="https://github.com/tablackburn/ScheduledTasksManager" target="_blank" rel="noopener"
+&gt;GitHub&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Issues &amp;amp; Feedback&lt;/strong&gt;: Report bugs or request features through &lt;a class="link" href="https://github.com/tablackburn/ScheduledTasksManager/issues" target="_blank" rel="noopener"
+&gt;GitHub Issues&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;I hope this module helps simplify your scheduled task management in clustered
+environments. Give it a try and let me know what you think!&lt;/p&gt;</description></item></channel></rss>
