@@ -1,0 +1,616 @@
+<!doctype html><html lang=en-us dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="A walkthrough of the patterns that make a psake build.ps1 entry point robust — from bootstrap flags and tab completion to dependency locking and proper CI exit codes."><title>Building a Resilient build.ps1 for psake Projects</title><link rel=canonical href=https://tablackburn.github.io/p/resilient-build-ps1/><link rel=stylesheet href=/scss/style.min.86591c898bd806857815fbb8c47e8d3fed97c133b78e83d9bfc27b164dd0aa2b.css><meta property='og:title' content="Building a Resilient build.ps1 for psake Projects"><meta property='og:description' content="A walkthrough of the patterns that make a psake build.ps1 entry point robust — from bootstrap flags and tab completion to dependency locking and proper CI exit codes."><meta property='og:url' content='https://tablackburn.github.io/p/resilient-build-ps1/'><meta property='og:site_name' content="Trent Blackburn's Blog"><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='PowerShell'><meta property='article:tag' content='psake'><meta property='article:tag' content='Automation'><meta property='article:tag' content='DevOps'><meta property='article:tag' content='CI/CD'><meta property='article:published_time' content='2026-03-30T00:00:00+00:00'><meta property='article:modified_time' content='2026-03-30T00:00:00+00:00'><meta name=twitter:title content="Building a Resilient build.ps1 for psake Projects"><meta name=twitter:description content="A walkthrough of the patterns that make a psake build.ps1 entry point robust — from bootstrap flags and tab completion to dependency locking and proper CI exit codes."><link rel="shortcut icon" href=/favicon.png></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label="Toggle Menu">
+<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><figure class=site-avatar><a href=/><img src=/img/avatar_hu_795cdfe36c63f1d5.png width=300 height=300 class=site-logo loading=lazy alt=Avatar>
+</a><span class=emoji>🍥</span></figure><div class=site-meta><h1 class=site-name><a href=/>Trent Blackburn's Blog</a></h1><h2 class=site-description>PowerShell, Automation, and DevOps</h2></div></header><ol class=menu-social><li><a href=https://github.com/tablackburn target=_blank title=GitHub rel=me><svg class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg></a></li><li><a href=https://www.linkedin.com/in/trentblackburn/ target=_blank title=LinkedIn rel=me><svg class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M10 14a3.5 3.5.0 005 0l4-4a3.5 3.5.0 00-5-5l-.5.5"/><path d="M14 10a3.5 3.5.0 00-5 0l-4 4a3.5 3.5.0 005 5l.5-.5"/></svg></a></li></ol><ol class=menu id=main-menu><li><a href=/><svg class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="5 12 3 12 12 3 21 12 19 12"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/><path d="M9 21v-6a2 2 0 012-2h2a2 2 0 012 2v6"/></svg>
+<span>Home</span></a></li><li><a href=/archives/><svg class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><rect x="3" y="4" width="18" height="4" rx="2"/><path d="M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+<span>Archives</span></a></li><li><a href=/search/><svg class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg>
+<span>Search</span></a></li><li><a href=/links/><svg class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M10 14a3.5 3.5.0 005 0l4-4a3.5 3.5.0 00-5-5l-.5.5"/><path d="M14 10a3.5 3.5.0 00-5 0l-4 4a3.5 3.5.0 005 5l.5-.5"/></svg>
+<span>Links</span></a></li><li class=menu-bottom-section><ol class=menu><li id=dark-mode-toggle><svg class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<svg class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<span>Dark Mode</span></li></ol></li></ol></aside><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class=widget-icon><svg class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg></div><h2 class="widget-title section-title">Table of contents</h2><div class=widget--toc><nav id=TableOfContents><ol><li><a href=#the-community-baseline>The Community Baseline</a></li><li><a href=#clear-errors-when-bootstrap-is-skipped>Clear Errors When Bootstrap Is Skipped</a></li><li><a href=#dynamic-tab-completion>Dynamic Tab Completion</a></li><li><a href=#try-import-first-pattern>Try-Import-First Pattern</a></li><li><a href=#internal-repository-registration>Internal Repository Registration</a></li><li><a href=#powershellget-version-pinning>PowerShellGet Version Pinning</a></li><li><a href=#the-complete-script>The Complete Script</a></li><li><a href=#wrapping-up>Wrapping Up</a></li></ol></nav></div></section></aside><main class="main full-width"><article class=main-article><header class=article-header><div class=article-details><header class=article-category><a href=/categories/powershell/ style=background-color:#efd8be;color:#3d280f>PowerShell
+</a><a href=/categories/devops/ style=background-color:#beefd8;color:#0f3d28>DevOps</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/p/resilient-build-ps1/>Building a Resilient build.ps1 for psake Projects</a></h2></div><footer class=article-time><div><svg class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
+<time class=article-time--published datetime=2026-03-30T00:00:00Z>Mar 30, 2026</time></div><div><svg class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<time class=article-time--reading>10 minute read</time></div></footer></div></header><section class=article-content><p>If you&rsquo;ve worked with <a class=link href=https://psake.dev target=_blank rel=noopener>psake</a>, you know that <code>psakefile.ps1</code>
+defines your build tasks — but it&rsquo;s <code>build.ps1</code> that ties everything together.
+It&rsquo;s the single entry point that bootstraps dependencies, invokes psake, and
+makes sure CI pipelines get a proper exit code.</p><p>The PowerShell community has converged on a solid <code>build.ps1</code> pattern. Projects
+like <a class=link href=https://github.com/psake/PowerShellBuild target=_blank rel=noopener>PowerShellBuild</a>,
+<a class=link href=https://github.com/poshbotio/PoshBot target=_blank rel=noopener>PoshBot</a>, and
+<a class=link href=https://github.com/psake/psake target=_blank rel=noopener>psake itself</a> all share the same core
+structure. This post walks through the patterns I&rsquo;ve added on top of that
+baseline to handle the rough edges you hit in enterprise environments — module
+lock contention, missing TLS protocols, internal package feeds, and developer
+UX.</p><h2 id=the-community-baseline>The Community Baseline</h2><p>Most psake projects use a <code>build.ps1</code> that looks something like this:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-powershell data-lang=powershell><span class=line><span class=cl><span class=p>[</span><span class=nb>CmdletBinding</span><span class=p>(</span><span class=na>DefaultParameterSetName</span> <span class=p>=</span> <span class=s1>&#39;task&#39;</span><span class=p>)]</span>
+</span></span><span class=line><span class=cl><span class=k>param</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>    <span class=p>[</span><span class=nb>parameter</span><span class=p>(</span><span class=na>ParameterSetName</span> <span class=p>=</span> <span class=s1>&#39;task&#39;</span><span class=p>,</span> <span class=na>Position</span> <span class=p>=</span> <span class=mf>0</span><span class=p>)]</span>
+</span></span><span class=line><span class=cl>    <span class=p>[</span><span class=no>string[]</span><span class=p>]</span><span class=nv>$Task</span> <span class=p>=</span> <span class=s1>&#39;default&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=p>[</span><span class=no>switch</span><span class=p>]</span><span class=nv>$Bootstrap</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=p>[</span><span class=nb>parameter</span><span class=p>(</span><span class=na>ParameterSetName</span> <span class=p>=</span> <span class=s1>&#39;Help&#39;</span><span class=p>)]</span>
+</span></span><span class=line><span class=cl>    <span class=p>[</span><span class=no>switch</span><span class=p>]</span><span class=nv>$Help</span>
+</span></span><span class=line><span class=cl><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nv>$ErrorActionPreference</span> <span class=p>=</span> <span class=s1>&#39;Stop&#39;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>if</span> <span class=p>(</span><span class=nv>$Bootstrap</span><span class=p>.</span><span class=n>IsPresent</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nb>Get-PackageProvider</span> <span class=n>-Name</span> <span class=n>Nuget</span> <span class=n>-ForceBootstrap</span> <span class=p>|</span> <span class=nb>Out-Null</span>
+</span></span><span class=line><span class=cl>    <span class=nb>Set-PSRepository</span> <span class=n>-Name</span> <span class=n>PSGallery</span> <span class=n>-InstallationPolicy</span> <span class=n>Trusted</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=p>(</span><span class=o>-not</span> <span class=p>(</span><span class=nb>Get-Module</span> <span class=n>-Name</span> <span class=n>PSDepend</span> <span class=n>-ListAvailable</span><span class=p>))</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nb>Install-Module</span> <span class=n>-Name</span> <span class=n>PSDepend</span> <span class=n>-Repository</span> <span class=n>PSGallery</span> <span class=n>-Scope</span> <span class=n>CurrentUser</span> <span class=n>-Force</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=nb>Import-Module</span> <span class=n>-Name</span> <span class=n>PSDepend</span> <span class=n>-Verbose:</span><span class=vm>$false</span>
+</span></span><span class=line><span class=cl>    <span class=nb>Invoke-PSDepend</span> <span class=n>-Path</span> <span class=s1>&#39;./requirements.psd1&#39;</span> <span class=n>-Install</span> <span class=n>-Import</span> <span class=n>-Force</span> <span class=n>-WarningAction</span> <span class=n>SilentlyContinue</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nv>$psakeFile</span> <span class=p>=</span> <span class=s1>&#39;./psakeFile.ps1&#39;</span>
+</span></span><span class=line><span class=cl><span class=k>if</span> <span class=p>(</span><span class=nv>$PSCmdlet</span><span class=p>.</span><span class=na>ParameterSetName</span> <span class=o>-eq</span> <span class=s1>&#39;Help&#39;</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nb>Get-PSakeScriptTasks</span> <span class=n>-buildFile</span> <span class=nv>$psakeFile</span> <span class=p>|</span>
+</span></span><span class=line><span class=cl>        <span class=nb>Format-Table</span> <span class=n>-Property</span> <span class=n>Name</span><span class=p>,</span> <span class=n>Description</span><span class=p>,</span> <span class=nb>Alias</span><span class=p>,</span> <span class=n>DependsOn</span>
+</span></span><span class=line><span class=cl><span class=p>}</span> <span class=k>else</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nb>Set-BuildEnvironment</span> <span class=n>-Force</span>
+</span></span><span class=line><span class=cl>    <span class=nb>Invoke-psake</span> <span class=n>-buildFile</span> <span class=nv>$psakeFile</span> <span class=n>-taskList</span> <span class=nv>$Task</span> <span class=n>-nologo</span>
+</span></span><span class=line><span class=cl>    <span class=n>exit</span> <span class=p>([</span><span class=no>int</span><span class=p>](</span><span class=o>-not</span> <span class=nv>$psake</span><span class=p>.</span><span class=n>build_success</span><span class=p>))</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>This gives you a lot out of the box: <strong><code>-Bootstrap</code></strong> installs
+<a class=link href=https://github.com/RamblingCookieMonster/PSDepend target=_blank rel=noopener>PSDepend</a> and your declared
+dependencies, <strong><code>-Help</code></strong> lists available tasks,
+<strong><code>Set-BuildEnvironment</code></strong> makes the script CI-aware, and
+<strong><code>exit ([int](-not $psake.build_success))</code></strong> translates psake&rsquo;s success boolean
+into a proper exit code so your pipeline fails when the build fails.</p><p>Credit where it&rsquo;s due — this is a solid foundation. You can find real-world
+examples in <a class=link href=https://github.com/psake/PowerShellBuild target=_blank rel=noopener>PowerShellBuild</a>,
+<a class=link href=https://github.com/poshbotio/PoshBot target=_blank rel=noopener>PoshBot</a>, and
+<a class=link href=https://github.com/devblackops/github-action-psscriptanalyzer target=_blank rel=noopener>devblackops/github-action-psscriptanalyzer</a>.
+The rest of this post covers what I&rsquo;ve added on top.</p><h2 id=clear-errors-when-bootstrap-is-skipped>Clear Errors When Bootstrap Is Skipped</h2><p>In the standard pattern, if a developer skips <code>-Bootstrap</code> and PSDepend isn&rsquo;t
+installed, the script fails with an opaque error — typically something like
+<code>Invoke-PSDepend: The term 'Invoke-PSDepend' is not recognized</code>. That&rsquo;s not
+helpful for someone who just cloned the repo.</p><p>The fix is a simple guard:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-powershell data-lang=powershell><span class=line><span class=cl><span class=k>if</span> <span class=p>(</span><span class=nv>$Bootstrap</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=c># ... install dependencies ...</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=k>else</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=p>(</span><span class=o>-not</span> <span class=p>(</span><span class=nb>Get-Module</span> <span class=n>-Name</span> <span class=s1>&#39;PSDepend&#39;</span> <span class=n>-ListAvailable</span><span class=p>))</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=k>throw</span> <span class=s1>&#39;Missing dependencies. Please run with the &#34;-Bootstrap&#34; flag to install dependencies.&#39;</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=nb>Invoke-PSDepend</span> <span class=n>-Path</span> <span class=nv>$PSScriptRoot</span> <span class=n>-Recurse</span> <span class=vm>$False</span> <span class=n>-WarningAction</span> <span class=s1>&#39;SilentlyContinue&#39;</span> <span class=n>-Import</span> <span class=n>-Force</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>Now the developer gets a one-line message telling them exactly what to do. Small
+change, big improvement in onboarding experience.</p><h2 id=dynamic-tab-completion>Dynamic Tab Completion</h2><p>The standard <code>build.ps1</code> handles task names in one of two ways:
+<strong><code>[ValidateSet()]</code></strong> with a hardcoded list (used by PoshBot, psake itself), or
+<strong><code>[ArgumentCompleter]</code></strong> that calls <code>Get-PSakeScriptTasks</code> (used by
+PowerShellBuild).</p><p><code>[ValidateSet()]</code> works, but you have to update it every time you add or rename a
+task. <code>[ArgumentCompleter]</code> reads the task list live from your psake file:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-powershell data-lang=powershell><span class=line><span class=cl><span class=p>[</span><span class=n>ArgumentCompleter</span><span class=p>(</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=k>param</span><span class=p>(</span><span class=nv>$Command</span><span class=p>,</span> <span class=nv>$Parameter</span><span class=p>,</span> <span class=nv>$WordToComplete</span><span class=p>,</span> <span class=nv>$CommandAst</span><span class=p>,</span> <span class=nv>$FakeBoundParams</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=k>try</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=nb>Get-PSakeScriptTasks</span> <span class=n>-BuildFile</span> <span class=s1>&#39;./build.psake.ps1&#39;</span> <span class=n>-ErrorAction</span> <span class=s1>&#39;Stop&#39;</span> <span class=p>|</span>
+</span></span><span class=line><span class=cl>            <span class=nb>Where-Object</span> <span class=p>{</span> <span class=nv>$_</span><span class=p>.</span><span class=py>Name</span> <span class=o>-like</span> <span class=s2>&#34;</span><span class=nv>$WordToComplete</span><span class=s2>*&#34;</span> <span class=p>}</span> <span class=p>|</span>
+</span></span><span class=line><span class=cl>            <span class=nb>Select-Object</span> <span class=n>-ExpandProperty</span> <span class=s1>&#39;Name&#39;</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=k>catch</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=vm>@</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>})]</span>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=no>string[]</span><span class=p>]</span><span class=nv>$Task</span> <span class=p>=</span> <span class=s1>&#39;default&#39;</span><span class=p>,</span>
+</span></span></code></pre></td></tr></table></div></div><p>The <code>try/catch</code> returning <code>@()</code> is important — it means tab completion degrades
+gracefully if psake isn&rsquo;t installed yet (before the first <code>-Bootstrap</code> run)
+instead of throwing an error in the user&rsquo;s terminal.</p><p>One gotcha: PSScriptAnalyzer will flag the completer&rsquo;s parameters (<code>$Command</code>,
+<code>$Parameter</code>, <code>$CommandAst</code>, <code>$FakeBoundParams</code>) as unused, even though they&rsquo;re
+required by the <code>[ArgumentCompleter]</code> contract. You&rsquo;ll need
+<code>SuppressMessageAttribute</code> declarations at the top of the script:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-powershell data-lang=powershell><span class=line><span class=cl><span class=p>[</span><span class=n>Diagnostics</span><span class=p>.</span><span class=py>CodeAnalysis</span><span class=p>.</span><span class=py>SuppressMessageAttribute</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>    <span class=s1>&#39;PSReviewUnusedParameter&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=s1>&#39;Command&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=n>Justification</span> <span class=p>=</span> <span class=s1>&#39;false positive&#39;</span>
+</span></span><span class=line><span class=cl><span class=p>)]</span>
+</span></span></code></pre></td></tr></table></div></div><p>Repeat for each parameter. It&rsquo;s verbose, but it keeps your PSScriptAnalyzer
+output clean.</p><h2 id=try-import-first-pattern>Try-Import-First Pattern</h2><p>This is the pattern I haven&rsquo;t seen in any other <code>build.ps1</code> — and it&rsquo;s the one
+that&rsquo;s saved me the most headaches.</p><p>The standard bootstrap calls <code>Invoke-PSDepend -Install -Import</code>, which downloads
+and imports modules in one shot. That works fine for a single developer, but in
+CI with concurrent jobs sharing a module cache, you can hit file lock errors when
+one job is mid-install while another tries to do the same.</p><p>The fix: <strong>try importing first, only install if the import fails</strong>.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-powershell data-lang=powershell><span class=line><span class=cl><span class=nv>$psDependParameters</span> <span class=p>=</span> <span class=vm>@</span><span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>Path</span>          <span class=p>=</span> <span class=nv>$PSScriptRoot</span>
+</span></span><span class=line><span class=cl>    <span class=n>Recurse</span>       <span class=p>=</span> <span class=vm>$False</span>
+</span></span><span class=line><span class=cl>    <span class=n>WarningAction</span> <span class=p>=</span> <span class=s1>&#39;SilentlyContinue&#39;</span>
+</span></span><span class=line><span class=cl>    <span class=n>Import</span>        <span class=p>=</span> <span class=vm>$True</span>
+</span></span><span class=line><span class=cl>    <span class=n>Force</span>         <span class=p>=</span> <span class=vm>$True</span>
+</span></span><span class=line><span class=cl>    <span class=n>ErrorAction</span>   <span class=p>=</span> <span class=s1>&#39;Stop&#39;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nv>$importSucceeded</span> <span class=p>=</span> <span class=vm>$false</span>
+</span></span><span class=line><span class=cl><span class=k>try</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nb>Invoke-PSDepend</span> <span class=nv>@psDependParameters</span>
+</span></span><span class=line><span class=cl>    <span class=nv>$importSucceeded</span> <span class=p>=</span> <span class=vm>$true</span>
+</span></span><span class=line><span class=cl>    <span class=nb>Write-Verbose</span> <span class=s1>&#39;Successfully imported existing modules.&#39;</span> <span class=n>-Verbose</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=k>catch</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nb>Write-Verbose</span> <span class=s2>&#34;Could not import all required modules: </span><span class=nv>$_</span><span class=s2>&#34;</span> <span class=n>-Verbose</span>
+</span></span><span class=line><span class=cl>    <span class=nb>Write-Verbose</span> <span class=s1>&#39;Attempting to install missing or outdated dependencies...&#39;</span> <span class=n>-Verbose</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>if</span> <span class=p>(</span><span class=o>-not</span> <span class=nv>$importSucceeded</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>try</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nb>Invoke-PSDepend</span> <span class=nv>@psDependParameters</span> <span class=n>-Install</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=k>catch</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nb>Write-Error</span> <span class=s2>&#34;Failed to install and import required dependencies: </span><span class=nv>$_</span><span class=s2>&#34;</span>
+</span></span><span class=line><span class=cl>        <span class=nb>Write-Error</span> <span class=s1>&#39;This may be due to locked module files. Please restart the build environment or clear module locks.&#39;</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=p>(</span><span class=nv>$_</span><span class=p>.</span><span class=py>Exception</span><span class=p>.</span><span class=n>InnerException</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=nb>Write-Error</span> <span class=s2>&#34;Inner exception: </span><span class=p>$(</span><span class=nv>$_</span><span class=p>.</span><span class=py>Exception</span><span class=p>.</span><span class=py>InnerException</span><span class=p>.</span><span class=n>Message</span><span class=p>)</span><span class=s2>&#34;</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=k>throw</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>If the modules are already present from a previous run (or a parallel job that
+finished first), the import-only path is instant and lock-free. You only pay the
+install cost when something is actually missing or outdated. The error handling
+also gives CI operators a clear next step when lock contention does occur.</p><h2 id=internal-repository-registration>Internal Repository Registration</h2><p>Enterprise teams often host internal NuGet feeds — ProGet, Azure Artifacts,
+MyGet, or similar — rather than pulling everything from PSGallery. The bootstrap
+needs to register that repository before PSDepend can install from it.</p><p>The pattern is idempotent: check if the repo exists, register it if it doesn&rsquo;t.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-powershell data-lang=powershell><span class=line><span class=cl><span class=nv>$repositoryName</span> <span class=p>=</span> <span class=s1>&#39;internal-nuget-repo&#39;</span>
+</span></span><span class=line><span class=cl><span class=k>if</span> <span class=p>(</span><span class=o>-not</span> <span class=p>(</span><span class=nb>Get-PSRepository</span> <span class=n>-Name</span> <span class=nv>$repositoryName</span> <span class=n>-ErrorAction</span> <span class=s1>&#39;SilentlyContinue&#39;</span><span class=p>))</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nv>$repositoryUrl</span> <span class=p>=</span> <span class=s2>&#34;https://nuget.example.com/api/v2/</span><span class=nv>$repositoryName</span><span class=s2>&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=nv>$registerPSRepositorySplat</span> <span class=p>=</span> <span class=vm>@</span><span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>Name</span>                      <span class=p>=</span> <span class=nv>$repositoryName</span>
+</span></span><span class=line><span class=cl>        <span class=n>SourceLocation</span>            <span class=p>=</span> <span class=nv>$repositoryUrl</span>
+</span></span><span class=line><span class=cl>        <span class=n>PublishLocation</span>           <span class=p>=</span> <span class=nv>$repositoryUrl</span>
+</span></span><span class=line><span class=cl>        <span class=n>ScriptSourceLocation</span>      <span class=p>=</span> <span class=nv>$repositoryUrl</span>
+</span></span><span class=line><span class=cl>        <span class=n>InstallationPolicy</span>        <span class=p>=</span> <span class=s1>&#39;Trusted&#39;</span>
+</span></span><span class=line><span class=cl>        <span class=n>PackageManagementProvider</span> <span class=p>=</span> <span class=s1>&#39;NuGet&#39;</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=nb>Register-PSRepository</span> <span class=nv>@registerPSRepositorySplat</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>One detail worth calling out: before registering, you may need to patch the TLS
+protocol set. Some older Windows versions default to TLS 1.0/1.1, which modern
+NuGet feeds reject. The key is to use <code>-bor</code> (bitwise OR) to <em>add</em> TLS 1.2 and
+1.3 without removing whatever protocols are already enabled:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-powershell data-lang=powershell><span class=line><span class=cl><span class=p>[</span><span class=no>System.Net.ServicePointManager</span><span class=p>]::</span><span class=n>SecurityProtocol</span> <span class=p>=</span> <span class=p>(</span>
+</span></span><span class=line><span class=cl>    <span class=p>[</span><span class=no>System.Net.ServicePointManager</span><span class=p>]::</span><span class=n>SecurityProtocol</span> <span class=o>-bor</span>
+</span></span><span class=line><span class=cl>    <span class=p>[</span><span class=no>System.Net.SecurityProtocolType</span><span class=p>]::</span><span class=n>Tls12</span> <span class=o>-bor</span>
+</span></span><span class=line><span class=cl>    <span class=p>[</span><span class=no>System.Net.SecurityProtocolType</span><span class=p>]::</span><span class=n>Tls13</span>
+</span></span><span class=line><span class=cl><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><p>Using <code>-bor</code> instead of assignment (<code>=</code>) means you don&rsquo;t break connections that
+legitimately need an older protocol. It&rsquo;s a one-liner that prevents a class of
+mysterious &ldquo;unable to connect&rdquo; errors in mixed-OS environments.</p><h2 id=powershellget-version-pinning>PowerShellGet Version Pinning</h2><p>If your bootstrap registers internal repositories, you need PowerShellGet v2.
+Version 3 changed the module registration API and may not be available in all
+environments. Pinning to v2 avoids surprises:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-powershell data-lang=powershell><span class=line><span class=cl><span class=nv>$powerShellGetModule</span> <span class=p>=</span> <span class=nb>Get-Module</span> <span class=n>-Name</span> <span class=s1>&#39;PowerShellGet&#39;</span> <span class=n>-ListAvailable</span> <span class=p>|</span>
+</span></span><span class=line><span class=cl>    <span class=nb>Where-Object</span> <span class=p>{</span> <span class=nv>$_</span><span class=p>.</span><span class=py>Version</span><span class=p>.</span><span class=py>Major</span> <span class=o>-eq</span> <span class=mf>2</span> <span class=p>}</span> <span class=p>|</span>
+</span></span><span class=line><span class=cl>    <span class=nb>Sort-Object</span> <span class=n>-Property</span> <span class=s1>&#39;Version&#39;</span> <span class=n>-Descending</span> <span class=p>|</span>
+</span></span><span class=line><span class=cl>    <span class=nb>Select-Object</span> <span class=n>-First</span> <span class=mf>1</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nv>$powerShellGetModuleParameters</span> <span class=p>=</span> <span class=vm>@</span><span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>Name</span>           <span class=p>=</span> <span class=s1>&#39;PowerShellGet&#39;</span>
+</span></span><span class=line><span class=cl>    <span class=n>MinimumVersion</span> <span class=p>=</span> <span class=s1>&#39;2.0.0&#39;</span>
+</span></span><span class=line><span class=cl>    <span class=n>MaximumVersion</span> <span class=p>=</span> <span class=s1>&#39;2.99.99&#39;</span>
+</span></span><span class=line><span class=cl>    <span class=n>Force</span>          <span class=p>=</span> <span class=vm>$true</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>if</span> <span class=p>(</span><span class=o>-not</span> <span class=nv>$powerShellGetModule</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nb>Install-Module</span> <span class=nv>@powerShellGetModuleParameters</span> <span class=n>-Scope</span> <span class=s1>&#39;CurrentUser&#39;</span> <span class=n>-AllowClobber</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=nb>Import-Module</span> <span class=nv>@powerShellGetModuleParameters</span>
+</span></span></code></pre></td></tr></table></div></div><p>The <code>MinimumVersion</code>/<code>MaximumVersion</code> range ensures you get the latest v2.x
+without accidentally pulling in v3. <code>AllowClobber</code> handles the case where a
+different version is already loaded.</p><h2 id=the-complete-script>The Complete Script</h2><p>Here&rsquo;s everything above combined into a single <code>build.ps1</code>:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>  1
+</span><span class=lnt>  2
+</span><span class=lnt>  3
+</span><span class=lnt>  4
+</span><span class=lnt>  5
+</span><span class=lnt>  6
+</span><span class=lnt>  7
+</span><span class=lnt>  8
+</span><span class=lnt>  9
+</span><span class=lnt> 10
+</span><span class=lnt> 11
+</span><span class=lnt> 12
+</span><span class=lnt> 13
+</span><span class=lnt> 14
+</span><span class=lnt> 15
+</span><span class=lnt> 16
+</span><span class=lnt> 17
+</span><span class=lnt> 18
+</span><span class=lnt> 19
+</span><span class=lnt> 20
+</span><span class=lnt> 21
+</span><span class=lnt> 22
+</span><span class=lnt> 23
+</span><span class=lnt> 24
+</span><span class=lnt> 25
+</span><span class=lnt> 26
+</span><span class=lnt> 27
+</span><span class=lnt> 28
+</span><span class=lnt> 29
+</span><span class=lnt> 30
+</span><span class=lnt> 31
+</span><span class=lnt> 32
+</span><span class=lnt> 33
+</span><span class=lnt> 34
+</span><span class=lnt> 35
+</span><span class=lnt> 36
+</span><span class=lnt> 37
+</span><span class=lnt> 38
+</span><span class=lnt> 39
+</span><span class=lnt> 40
+</span><span class=lnt> 41
+</span><span class=lnt> 42
+</span><span class=lnt> 43
+</span><span class=lnt> 44
+</span><span class=lnt> 45
+</span><span class=lnt> 46
+</span><span class=lnt> 47
+</span><span class=lnt> 48
+</span><span class=lnt> 49
+</span><span class=lnt> 50
+</span><span class=lnt> 51
+</span><span class=lnt> 52
+</span><span class=lnt> 53
+</span><span class=lnt> 54
+</span><span class=lnt> 55
+</span><span class=lnt> 56
+</span><span class=lnt> 57
+</span><span class=lnt> 58
+</span><span class=lnt> 59
+</span><span class=lnt> 60
+</span><span class=lnt> 61
+</span><span class=lnt> 62
+</span><span class=lnt> 63
+</span><span class=lnt> 64
+</span><span class=lnt> 65
+</span><span class=lnt> 66
+</span><span class=lnt> 67
+</span><span class=lnt> 68
+</span><span class=lnt> 69
+</span><span class=lnt> 70
+</span><span class=lnt> 71
+</span><span class=lnt> 72
+</span><span class=lnt> 73
+</span><span class=lnt> 74
+</span><span class=lnt> 75
+</span><span class=lnt> 76
+</span><span class=lnt> 77
+</span><span class=lnt> 78
+</span><span class=lnt> 79
+</span><span class=lnt> 80
+</span><span class=lnt> 81
+</span><span class=lnt> 82
+</span><span class=lnt> 83
+</span><span class=lnt> 84
+</span><span class=lnt> 85
+</span><span class=lnt> 86
+</span><span class=lnt> 87
+</span><span class=lnt> 88
+</span><span class=lnt> 89
+</span><span class=lnt> 90
+</span><span class=lnt> 91
+</span><span class=lnt> 92
+</span><span class=lnt> 93
+</span><span class=lnt> 94
+</span><span class=lnt> 95
+</span><span class=lnt> 96
+</span><span class=lnt> 97
+</span><span class=lnt> 98
+</span><span class=lnt> 99
+</span><span class=lnt>100
+</span><span class=lnt>101
+</span><span class=lnt>102
+</span><span class=lnt>103
+</span><span class=lnt>104
+</span><span class=lnt>105
+</span><span class=lnt>106
+</span><span class=lnt>107
+</span><span class=lnt>108
+</span><span class=lnt>109
+</span><span class=lnt>110
+</span><span class=lnt>111
+</span><span class=lnt>112
+</span><span class=lnt>113
+</span><span class=lnt>114
+</span><span class=lnt>115
+</span><span class=lnt>116
+</span><span class=lnt>117
+</span><span class=lnt>118
+</span><span class=lnt>119
+</span><span class=lnt>120
+</span><span class=lnt>121
+</span><span class=lnt>122
+</span><span class=lnt>123
+</span><span class=lnt>124
+</span><span class=lnt>125
+</span><span class=lnt>126
+</span><span class=lnt>127
+</span><span class=lnt>128
+</span><span class=lnt>129
+</span><span class=lnt>130
+</span><span class=lnt>131
+</span><span class=lnt>132
+</span><span class=lnt>133
+</span><span class=lnt>134
+</span><span class=lnt>135
+</span><span class=lnt>136
+</span><span class=lnt>137
+</span><span class=lnt>138
+</span><span class=lnt>139
+</span><span class=lnt>140
+</span><span class=lnt>141
+</span><span class=lnt>142
+</span><span class=lnt>143
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-powershell data-lang=powershell><span class=line><span class=cl><span class=p>[</span><span class=n>Diagnostics</span><span class=p>.</span><span class=py>CodeAnalysis</span><span class=p>.</span><span class=py>SuppressMessageAttribute</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>    <span class=s1>&#39;PSReviewUnusedParameter&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=s1>&#39;Command&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=n>Justification</span> <span class=p>=</span> <span class=s1>&#39;false positive&#39;</span>
+</span></span><span class=line><span class=cl><span class=p>)]</span>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=n>Diagnostics</span><span class=p>.</span><span class=py>CodeAnalysis</span><span class=p>.</span><span class=py>SuppressMessageAttribute</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>    <span class=s1>&#39;PSReviewUnusedParameter&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=s1>&#39;Parameter&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=n>Justification</span> <span class=p>=</span> <span class=s1>&#39;false positive&#39;</span>
+</span></span><span class=line><span class=cl><span class=p>)]</span>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=n>Diagnostics</span><span class=p>.</span><span class=py>CodeAnalysis</span><span class=p>.</span><span class=py>SuppressMessageAttribute</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>    <span class=s1>&#39;PSReviewUnusedParameter&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=s1>&#39;CommandAst&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=n>Justification</span> <span class=p>=</span> <span class=s1>&#39;false positive&#39;</span>
+</span></span><span class=line><span class=cl><span class=p>)]</span>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=n>Diagnostics</span><span class=p>.</span><span class=py>CodeAnalysis</span><span class=p>.</span><span class=py>SuppressMessageAttribute</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>    <span class=s1>&#39;PSReviewUnusedParameter&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=s1>&#39;FakeBoundParams&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=n>Justification</span> <span class=p>=</span> <span class=s1>&#39;false positive&#39;</span>
+</span></span><span class=line><span class=cl><span class=p>)]</span>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=nb>CmdletBinding</span><span class=p>(</span><span class=na>DefaultParameterSetName</span> <span class=p>=</span> <span class=s1>&#39;task&#39;</span><span class=p>)]</span>
+</span></span><span class=line><span class=cl><span class=k>param</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>    <span class=p>[</span><span class=nb>parameter</span><span class=p>(</span><span class=na>ParameterSetName</span> <span class=p>=</span> <span class=s1>&#39;task&#39;</span><span class=p>,</span> <span class=na>Position</span> <span class=p>=</span> <span class=mf>0</span><span class=p>)]</span>
+</span></span><span class=line><span class=cl>    <span class=p>[</span><span class=n>ArgumentCompleter</span><span class=p>(</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=k>param</span><span class=p>(</span><span class=nv>$Command</span><span class=p>,</span> <span class=nv>$Parameter</span><span class=p>,</span> <span class=nv>$WordToComplete</span><span class=p>,</span> <span class=nv>$CommandAst</span><span class=p>,</span> <span class=nv>$FakeBoundParams</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=k>try</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                <span class=nb>Get-PSakeScriptTasks</span> <span class=n>-BuildFile</span> <span class=s1>&#39;./psakeFile.ps1&#39;</span> <span class=n>-ErrorAction</span> <span class=s1>&#39;Stop&#39;</span> <span class=p>|</span>
+</span></span><span class=line><span class=cl>                <span class=nb>Where-Object</span> <span class=p>{</span> <span class=nv>$_</span><span class=p>.</span><span class=py>Name</span> <span class=o>-like</span> <span class=s2>&#34;</span><span class=nv>$WordToComplete</span><span class=s2>*&#34;</span> <span class=p>}</span> <span class=p>|</span>
+</span></span><span class=line><span class=cl>                <span class=nb>Select-Object</span> <span class=n>-ExpandProperty</span> <span class=s1>&#39;Name&#39;</span>
+</span></span><span class=line><span class=cl>            <span class=p>}</span>
+</span></span><span class=line><span class=cl>            <span class=k>catch</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                <span class=vm>@</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>            <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=p>})]</span>
+</span></span><span class=line><span class=cl>    <span class=p>[</span><span class=no>string[]</span><span class=p>]</span><span class=nv>$Task</span> <span class=p>=</span> <span class=s1>&#39;default&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=p>[</span><span class=no>switch</span><span class=p>]</span><span class=nv>$Bootstrap</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=p>[</span><span class=nb>parameter</span><span class=p>(</span><span class=na>ParameterSetName</span> <span class=p>=</span> <span class=s1>&#39;Help&#39;</span><span class=p>)]</span>
+</span></span><span class=line><span class=cl>    <span class=p>[</span><span class=no>switch</span><span class=p>]</span><span class=nv>$Help</span>
+</span></span><span class=line><span class=cl><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nv>$ErrorActionPreference</span> <span class=p>=</span> <span class=s1>&#39;Stop&#39;</span>
+</span></span><span class=line><span class=cl><span class=nv>$psakeFile</span> <span class=p>=</span> <span class=s1>&#39;./psakeFile.ps1&#39;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>if</span> <span class=p>(</span><span class=nv>$Bootstrap</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=c># Patch TLS protocols for older Windows versions</span>
+</span></span><span class=line><span class=cl>    <span class=p>[</span><span class=no>System.Net.ServicePointManager</span><span class=p>]::</span><span class=n>SecurityProtocol</span> <span class=p>=</span> <span class=p>(</span>
+</span></span><span class=line><span class=cl>        <span class=p>[</span><span class=no>System.Net.ServicePointManager</span><span class=p>]::</span><span class=n>SecurityProtocol</span> <span class=o>-bor</span>
+</span></span><span class=line><span class=cl>        <span class=p>[</span><span class=no>System.Net.SecurityProtocolType</span><span class=p>]::</span><span class=n>Tls12</span> <span class=o>-bor</span>
+</span></span><span class=line><span class=cl>        <span class=p>[</span><span class=no>System.Net.SecurityProtocolType</span><span class=p>]::</span><span class=n>Tls13</span>
+</span></span><span class=line><span class=cl>    <span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=nb>Get-PackageProvider</span> <span class=n>-Name</span> <span class=n>Nuget</span> <span class=n>-ForceBootstrap</span> <span class=p>|</span> <span class=nb>Out-Null</span>
+</span></span><span class=line><span class=cl>    <span class=nb>Set-PSRepository</span> <span class=n>-Name</span> <span class=n>PSGallery</span> <span class=n>-InstallationPolicy</span> <span class=n>Trusted</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=c># Pin PowerShellGet to v2</span>
+</span></span><span class=line><span class=cl>    <span class=nv>$powerShellGetModule</span> <span class=p>=</span> <span class=nb>Get-Module</span> <span class=n>-Name</span> <span class=s1>&#39;PowerShellGet&#39;</span> <span class=n>-ListAvailable</span> <span class=p>|</span>
+</span></span><span class=line><span class=cl>        <span class=nb>Where-Object</span> <span class=p>{</span> <span class=nv>$_</span><span class=p>.</span><span class=py>Version</span><span class=p>.</span><span class=py>Major</span> <span class=o>-eq</span> <span class=mf>2</span> <span class=p>}</span> <span class=p>|</span>
+</span></span><span class=line><span class=cl>        <span class=nb>Sort-Object</span> <span class=n>-Property</span> <span class=s1>&#39;Version&#39;</span> <span class=n>-Descending</span> <span class=p>|</span>
+</span></span><span class=line><span class=cl>        <span class=nb>Select-Object</span> <span class=n>-First</span> <span class=mf>1</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=nv>$powerShellGetModuleParameters</span> <span class=p>=</span> <span class=vm>@</span><span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>Name</span>           <span class=p>=</span> <span class=s1>&#39;PowerShellGet&#39;</span>
+</span></span><span class=line><span class=cl>        <span class=n>MinimumVersion</span> <span class=p>=</span> <span class=s1>&#39;2.0.0&#39;</span>
+</span></span><span class=line><span class=cl>        <span class=n>MaximumVersion</span> <span class=p>=</span> <span class=s1>&#39;2.99.99&#39;</span>
+</span></span><span class=line><span class=cl>        <span class=n>Force</span>          <span class=p>=</span> <span class=vm>$true</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=p>(</span><span class=o>-not</span> <span class=nv>$powerShellGetModule</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nb>Install-Module</span> <span class=nv>@powerShellGetModuleParameters</span> <span class=n>-Scope</span> <span class=s1>&#39;CurrentUser&#39;</span> <span class=n>-AllowClobber</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=nb>Import-Module</span> <span class=nv>@powerShellGetModuleParameters</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=c># Register internal repository (idempotent)</span>
+</span></span><span class=line><span class=cl>    <span class=nv>$repositoryName</span> <span class=p>=</span> <span class=s1>&#39;internal-nuget-repo&#39;</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=p>(</span><span class=o>-not</span> <span class=p>(</span><span class=nb>Get-PSRepository</span> <span class=n>-Name</span> <span class=nv>$repositoryName</span> <span class=n>-ErrorAction</span> <span class=s1>&#39;SilentlyContinue&#39;</span><span class=p>))</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nv>$repositoryUrl</span> <span class=p>=</span> <span class=s2>&#34;https://nuget.example.com/api/v2/</span><span class=nv>$repositoryName</span><span class=s2>&#34;</span>
+</span></span><span class=line><span class=cl>        <span class=nv>$registerPSRepositorySplat</span> <span class=p>=</span> <span class=vm>@</span><span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=n>Name</span>                      <span class=p>=</span> <span class=nv>$repositoryName</span>
+</span></span><span class=line><span class=cl>            <span class=n>SourceLocation</span>            <span class=p>=</span> <span class=nv>$repositoryUrl</span>
+</span></span><span class=line><span class=cl>            <span class=n>PublishLocation</span>           <span class=p>=</span> <span class=nv>$repositoryUrl</span>
+</span></span><span class=line><span class=cl>            <span class=n>ScriptSourceLocation</span>      <span class=p>=</span> <span class=nv>$repositoryUrl</span>
+</span></span><span class=line><span class=cl>            <span class=n>InstallationPolicy</span>        <span class=p>=</span> <span class=s1>&#39;Trusted&#39;</span>
+</span></span><span class=line><span class=cl>            <span class=n>PackageManagementProvider</span> <span class=p>=</span> <span class=s1>&#39;NuGet&#39;</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=nb>Register-PSRepository</span> <span class=nv>@registerPSRepositorySplat</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=c># Install PSDepend if missing</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=p>(</span><span class=o>-not</span> <span class=p>(</span><span class=nb>Get-Module</span> <span class=n>-Name</span> <span class=n>PSDepend</span> <span class=n>-ListAvailable</span><span class=p>))</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nb>Install-Module</span> <span class=n>-Name</span> <span class=n>PSDepend</span> <span class=n>-Repository</span> <span class=n>PSGallery</span> <span class=n>-Scope</span> <span class=n>CurrentUser</span> <span class=n>-Force</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=c># Try-import-first pattern</span>
+</span></span><span class=line><span class=cl>    <span class=nv>$psDependParameters</span> <span class=p>=</span> <span class=vm>@</span><span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>Path</span>          <span class=p>=</span> <span class=nv>$PSScriptRoot</span>
+</span></span><span class=line><span class=cl>        <span class=n>Recurse</span>       <span class=p>=</span> <span class=vm>$False</span>
+</span></span><span class=line><span class=cl>        <span class=n>WarningAction</span> <span class=p>=</span> <span class=s1>&#39;SilentlyContinue&#39;</span>
+</span></span><span class=line><span class=cl>        <span class=n>Import</span>        <span class=p>=</span> <span class=vm>$True</span>
+</span></span><span class=line><span class=cl>        <span class=n>Force</span>         <span class=p>=</span> <span class=vm>$True</span>
+</span></span><span class=line><span class=cl>        <span class=n>ErrorAction</span>   <span class=p>=</span> <span class=s1>&#39;Stop&#39;</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=nv>$importSucceeded</span> <span class=p>=</span> <span class=vm>$false</span>
+</span></span><span class=line><span class=cl>    <span class=k>try</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nb>Invoke-PSDepend</span> <span class=nv>@psDependParameters</span>
+</span></span><span class=line><span class=cl>        <span class=nv>$importSucceeded</span> <span class=p>=</span> <span class=vm>$true</span>
+</span></span><span class=line><span class=cl>        <span class=nb>Write-Verbose</span> <span class=s1>&#39;Successfully imported existing modules.&#39;</span> <span class=n>-Verbose</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=k>catch</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nb>Write-Verbose</span> <span class=s2>&#34;Could not import all required modules: </span><span class=nv>$_</span><span class=s2>&#34;</span> <span class=n>-Verbose</span>
+</span></span><span class=line><span class=cl>        <span class=nb>Write-Verbose</span> <span class=s1>&#39;Attempting to install missing or outdated dependencies...&#39;</span> <span class=n>-Verbose</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=p>(</span><span class=o>-not</span> <span class=nv>$importSucceeded</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=k>try</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=nb>Invoke-PSDepend</span> <span class=nv>@psDependParameters</span> <span class=n>-Install</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=k>catch</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=nb>Write-Error</span> <span class=s2>&#34;Failed to install and import required dependencies: </span><span class=nv>$_</span><span class=s2>&#34;</span>
+</span></span><span class=line><span class=cl>            <span class=nb>Write-Error</span> <span class=s1>&#39;This may be due to locked module files. Please restart the build environment or clear module locks.&#39;</span>
+</span></span><span class=line><span class=cl>            <span class=k>if</span> <span class=p>(</span><span class=nv>$_</span><span class=p>.</span><span class=py>Exception</span><span class=p>.</span><span class=n>InnerException</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                <span class=nb>Write-Error</span> <span class=s2>&#34;Inner exception: </span><span class=p>$(</span><span class=nv>$_</span><span class=p>.</span><span class=py>Exception</span><span class=p>.</span><span class=py>InnerException</span><span class=p>.</span><span class=n>Message</span><span class=p>)</span><span class=s2>&#34;</span>
+</span></span><span class=line><span class=cl>            <span class=p>}</span>
+</span></span><span class=line><span class=cl>            <span class=k>throw</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=k>else</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=p>(</span><span class=o>-not</span> <span class=p>(</span><span class=nb>Get-Module</span> <span class=n>-Name</span> <span class=s1>&#39;PSDepend&#39;</span> <span class=n>-ListAvailable</span><span class=p>))</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=k>throw</span> <span class=s1>&#39;Missing dependencies. Please run with the &#34;-Bootstrap&#34; flag to install dependencies.&#39;</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=nb>Invoke-PSDepend</span> <span class=n>-Path</span> <span class=nv>$PSScriptRoot</span> <span class=n>-Recurse</span> <span class=vm>$False</span> <span class=n>-WarningAction</span> <span class=s1>&#39;SilentlyContinue&#39;</span> <span class=n>-Import</span> <span class=n>-Force</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>if</span> <span class=p>(</span><span class=nv>$PSCmdlet</span><span class=p>.</span><span class=na>ParameterSetName</span> <span class=o>-eq</span> <span class=s1>&#39;Help&#39;</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nb>Get-PSakeScriptTasks</span> <span class=n>-buildFile</span> <span class=nv>$psakeFile</span> <span class=p>|</span>
+</span></span><span class=line><span class=cl>        <span class=nb>Format-Table</span> <span class=n>-Property</span> <span class=n>Name</span><span class=p>,</span> <span class=n>Description</span><span class=p>,</span> <span class=nb>Alias</span><span class=p>,</span> <span class=n>DependsOn</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=k>else</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nb>Set-BuildEnvironment</span> <span class=n>-Force</span>
+</span></span><span class=line><span class=cl>    <span class=nb>Invoke-psake</span> <span class=n>-buildFile</span> <span class=nv>$psakeFile</span> <span class=n>-taskList</span> <span class=nv>$Task</span> <span class=n>-nologo</span>
+</span></span><span class=line><span class=cl>    <span class=n>exit</span> <span class=p>([</span><span class=no>int</span><span class=p>](</span><span class=o>-not</span> <span class=nv>$psake</span><span class=p>.</span><span class=n>build_success</span><span class=p>))</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=wrapping-up>Wrapping Up</h2><p>The community <code>build.ps1</code> pattern gets you 80% of the way — bootstrap,
+help, CI exit codes, and build environment detection are all table stakes. The
+patterns above handle the remaining 20%: the edge cases that surface when you&rsquo;re
+running concurrent CI jobs, onboarding new developers, or pulling dependencies
+from internal feeds.</p><p>None of these patterns are complex on their own. The value is in combining them
+into a single entry point that just works — whether you&rsquo;re running
+<code>.\build.ps1 -Bootstrap</code> for the first time or kicking off your hundredth CI
+build.</p><p>For further reading:</p><ul><li><a class=link href=https://psake.dev target=_blank rel=noopener>psake</a> — the build automation tool</li><li><a class=link href=https://github.com/psake/PowerShellBuild target=_blank rel=noopener>PowerShellBuild</a> — common psake
+build tasks for PowerShell modules</li><li><a class=link href=https://github.com/RamblingCookieMonster/PSDepend target=_blank rel=noopener>PSDepend</a> — declarative
+dependency management</li></ul></section><footer class=article-footer><section class=article-tags><a href=/tags/powershell/>PowerShell</a>
+<a href=/tags/psake/>Psake</a>
+<a href=/tags/automation/>Automation</a>
+<a href=/tags/devops/>DevOps</a>
+<a href=/tags/ci/cd/>CI/CD</a></section><section class=article-copyright><svg class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><path d="M14.5 9a3.5 4 0 100 6"/></svg>
+<span>Licensed under CC BY-NC-SA 4.0</span></section></footer></article><aside class=related-content--wrapper><h2 class=section-title>Related content</h2><div class=related-content><div class="flex article-list--tile"><article><a href=/p/announcing-scheduledtasksmanager-powershell-module/><div class=article-details><h2 class=article-title>Announcing ScheduledTasksManager: A New PowerShell Module for Cluster-Aware Task Management</h2></div></a></article><article><a href=/p/announcing-ai-agent-instruction-modules/><div class=article-details><h2 class=article-title>Announcing AIM: AI Agent Instruction Modules</h2></div></a></article></div></div></aside><div class=disqus-container><div id=disqus_thread></div><script>window.disqus_config=function(){},function(){if(["localhost","127.0.0.1"].indexOf(window.location.hostname)!=-1){document.getElementById("disqus_thread").innerHTML="Disqus comments not available by default when the website is previewed locally.";return}var t=document,e=t.createElement("script");e.async=!0,e.src="//hugo-theme-stack.disqus.com/embed.js",e.setAttribute("data-timestamp",+new Date),(t.head||t.body).appendChild(e)}()</script><noscript>Please enable JavaScript to view the <a href=https://disqus.com/?ref_noscript>comments powered by Disqus.</a></noscript><a href=https://disqus.com class=dsq-brlink>comments powered by <span class=logo-disqus>Disqus</span></a></div><style>.disqus-container{background-color:var(--card-background);border-radius:var(--card-border-radius);box-shadow:var(--shadow-l1);padding:var(--card-padding)}</style><script>window.addEventListener("onColorSchemeChange",e=>{typeof DISQUS=="object"&&DISQUS.reset({reload:!0})})</script><footer class=site-footer><section class=copyright>&copy;
+2020 -
+2026 Trent Blackburn's Blog</section><section class=powerby>Built with <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a><br>Theme <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=3.34.2>Stack</a></b> designed by <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a></section></footer><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+<button class="pswp__button pswp__button--share" title=Share></button>
+<button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button><div class=pswp__preloader><div class=pswp__preloader__icn><div class=pswp__preloader__cut><div class=pswp__preloader__donut></div></div></div></div></div><div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class=pswp__share-tooltip></div></div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+</button>
+<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button><div class=pswp__caption><div class=pswp__caption__center></div></div></div></div></div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css crossorigin=anonymous></main></div><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/ts/main.c922af694cc257bf1ecc41c0dd7b0430f9114ec280ccf67cd2c6ad55f5316c4e.js defer></script><script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>
