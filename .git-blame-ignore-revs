@@ -1,0 +1,9 @@
+# Revisions to ignore when running git blame.
+#
+# Configure your local clone with:
+#   git config blame.ignoreRevsFile .git-blame-ignore-revs
+#
+# GitHub's web UI uses this file automatically.
+
+# chore: renormalize line endings to LF (20 files, content unchanged)
+a4c2da8c1560793a3aaf768affc992e9dc673224
