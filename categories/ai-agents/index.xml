@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>AI Agents on Trent Blackburn's Blog</title><link>https://tablackburn.github.io/categories/ai-agents/</link><description>Recent content in AI Agents on Trent Blackburn's Blog</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sun, 28 Dec 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://tablackburn.github.io/categories/ai-agents/index.xml" rel="self" type="application/rss+xml"/><item><title>Announcing AIM: AI Agent Instruction Modules</title><link>https://tablackburn.github.io/p/announcing-ai-agent-instruction-modules/</link><pubDate>Sun, 28 Dec 2025 00:00:00 +0000</pubDate><guid>https://tablackburn.github.io/p/announcing-ai-agent-instruction-modules/</guid><description>&lt;p&gt;I&amp;rsquo;m excited to announce the release of &lt;strong&gt;AIM (AI Agent Instruction Modules)
+v0.7.0&lt;/strong&gt;! This project is now available on
+&lt;a class="link" href="https://github.com/tablackburn/ai-agent-instruction-modules" target="_blank" rel="noopener"
+&gt;GitHub&lt;/a&gt; and
+provides a standardized approach to managing AI agent instructions across
+codebases.&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://tablackburn.github.io/img/aim-banner.svg"
+loading="lazy"
+alt="AIM banner"
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a class="link" href="https://github.com/tablackburn/ai-agent-instruction-modules/releases" target="_blank" rel="noopener"
+&gt;&lt;img src="https://img.shields.io/github/v/release/tablackburn/ai-agent-instruction-modules?display_name=tag"
+loading="lazy"
+alt="Release"
+&gt;&lt;/a&gt; &lt;a class="link" href="https://github.com/tablackburn/ai-agent-instruction-modules/blob/main/LICENSE" target="_blank" rel="noopener"
+&gt;&lt;img src="https://img.shields.io/github/license/tablackburn/ai-agent-instruction-modules"
+loading="lazy"
+alt="License"
+&gt;&lt;/a&gt;
+&lt;a class="link" href="https://github.com/tablackburn/ai-agent-instruction-modules/stargazers" target="_blank" rel="noopener"
+&gt;&lt;img src="https://img.shields.io/github/stars/tablackburn/ai-agent-instruction-modules"
+loading="lazy"
+alt="Stars"
+&gt;&lt;/a&gt; &lt;img src="https://img.shields.io/badge/agents-Copilot%20%7C%20Claude%20%7C%20Cursor-blue"
+loading="lazy"
+alt="Agents Supported"
+&gt;&lt;/p&gt;
+&lt;h2 id="the-problem"&gt;The Problem
+&lt;/h2&gt;&lt;p&gt;Working with AI coding agents like GitHub Copilot, Claude, Cursor, and others is
+powerful, but each project often needs custom instructions to work effectively.
+Managing these instructions can be inconsistent—they might be scattered across
+&lt;code&gt;.claude&lt;/code&gt;, &lt;code&gt;.cursorrules&lt;/code&gt;, &lt;code&gt;CLAUDE.md&lt;/code&gt;, &lt;code&gt;COPILOT.md&lt;/code&gt;, or various other
+locations.&lt;/p&gt;
+&lt;p&gt;Consider a typical scenario: Your team has 10 repositories. In repository A,
+you&amp;rsquo;ve created a &lt;code&gt;.claude&lt;/code&gt; file with your coding standards. In repository B,
+someone used &lt;code&gt;.cursorrules&lt;/code&gt; for Cursor. Repository C has a plain text
+&lt;code&gt;COPILOT.md&lt;/code&gt; file. Repository D has nothing. When you update a best practice,
+you need to manually update all of them. This fragmentation makes it hard to:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Maintain consistent practices across projects&lt;/li&gt;
+&lt;li&gt;Share best practices between teams&lt;/li&gt;
+&lt;li&gt;Keep instructions up-to-date across multiple repositories&lt;/li&gt;
+&lt;li&gt;Ensure all team members use the same agent guidance&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="the-solution"&gt;The Solution
+&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;AIM&lt;/strong&gt; is a modular, opt-in collection of instruction modules that work with all
+major AI coding agents through the standardized &lt;a class="link" href="https://agents.md/" target="_blank" rel="noopener"
+&gt;agents.md&lt;/a&gt;
+format. The agents.md standard is an open specification for AI agent
+instructions, supported by GitHub Copilot, Claude, Cursor, Windsurf, and other
+popular coding agents. By leveraging this standard, AIM ensures your instructions
+work reliably across all these platforms without vendor lock-in. It provides:&lt;/p&gt;
+&lt;h3 id="core-features"&gt;Core Features
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;12+ Instruction Modules&lt;/strong&gt;: Covering workflows, standards, and best practices&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Language &amp;amp; Tool Specific Modules&lt;/strong&gt;: PowerShell, Markdown, GitHub CLI, and
+more&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Repository Management&lt;/strong&gt;: Release procedures, version control, and
+contribution guidelines&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Easy Deployment&lt;/strong&gt;: Simple setup with templates and deployment procedures&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Customizable&lt;/strong&gt;: Extend with repository-specific instructions while staying
+synchronized&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="what-aim-includes"&gt;What AIM Includes
+&lt;/h3&gt;&lt;h4 id="core-modules"&gt;Core Modules
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Agent Workflow&lt;/strong&gt; - Pre-flight protocol for AI agents to follow&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Shorthand&lt;/strong&gt; - Guidelines for avoiding abbreviations in code&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Git Workflow&lt;/strong&gt; - Branching, commits, and pull request conventions&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Testing&lt;/strong&gt; - Test writing best practices and conventions&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="language--tool-modules"&gt;Language &amp;amp; Tool Modules
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;PowerShell&lt;/strong&gt; - Cmdlet naming, parameter conventions, and scripting best
+practices&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Markdown&lt;/strong&gt; - Documentation formatting and structure guidelines&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;README&lt;/strong&gt; - README maintenance guidelines&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;GitHub CLI&lt;/strong&gt; - Efficient PR and issue management workflows&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="repository-management"&gt;Repository Management
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Releases&lt;/strong&gt; - Release management with semantic versioning&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Update&lt;/strong&gt; - Procedures for keeping downstream repositories current&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Contributing&lt;/strong&gt; - Workflow for contributing improvements upstream&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="quick-start"&gt;Quick Start
+&lt;/h2&gt;&lt;p&gt;Head over to the &lt;a class="link" href="https://github.com/tablackburn/ai-agent-instruction-modules" target="_blank" rel="noopener"
+&gt;AIM GitHub repository&lt;/a&gt;
+for complete setup instructions. The README includes:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Automated Deployment&lt;/strong&gt; - Copy a prompt into your AI agent for fully
+automated setup&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Manual Alternative&lt;/strong&gt; - Step-by-step instructions if you prefer to set
+things up manually&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Updating Instructions&lt;/strong&gt; - How to keep your instructions synchronized with
+the latest releases&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Repository Structure&lt;/strong&gt; - Complete overview of all included modules&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;The documentation is kept up-to-date with each release, ensuring you always
+have the latest deployment procedures and prompts.&lt;/p&gt;
+&lt;h2 id="who-should-use-aim"&gt;Who Should Use AIM?
+&lt;/h2&gt;&lt;p&gt;AIM is ideal for:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Teams managing multiple repositories&lt;/strong&gt; - Standardize practices across your
+entire codebase&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Organizations standardizing on AI agents&lt;/strong&gt; - Ensure consistent behavior
+regardless of which agent team members use&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Open source projects&lt;/strong&gt; - Provide clear guidance to contributors working
+with AI coding assistants&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;DevOps and platform teams&lt;/strong&gt; - Enforce standards and best practices across
+all downstream projects&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Solo developers&lt;/strong&gt; - Maintain consistent standards as your projects grow&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Enterprises&lt;/strong&gt; - Build a foundation for AI agent governance and compliance&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Whether you&amp;rsquo;re starting fresh or migrating from scattered instruction files, AIM
+provides a proven, tested approach that grows with your needs.&lt;/p&gt;
+&lt;h2 id="repository-structure"&gt;Repository Structure
+&lt;/h2&gt;&lt;p&gt;The project is organized as:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Root files&lt;/strong&gt;: &lt;code&gt;AGENTS.md&lt;/code&gt;, &lt;code&gt;CHANGELOG.md&lt;/code&gt;, &lt;code&gt;README.md&lt;/code&gt;, and contribution
+guidelines&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;&lt;code&gt;instructions/&lt;/code&gt; folder&lt;/strong&gt;: 12+ modular instruction files covering workflows,
+languages, and tooling&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;&lt;code&gt;tests/&lt;/code&gt; folder&lt;/strong&gt;: Pester tests that validate instruction integrity&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;CI/CD&lt;/strong&gt;: GitHub Actions workflows for continuous validation&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;For a complete folder listing, see the
+&lt;a class="link" href="https://github.com/tablackburn/ai-agent-instruction-modules" target="_blank" rel="noopener"
+&gt;project repository&lt;/a&gt;.&lt;/p&gt;
+&lt;h2 id="community-contributions"&gt;Community Contributions
+&lt;/h2&gt;&lt;p&gt;AIM is open to community contributions! We&amp;rsquo;re looking for new instruction
+modules for:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Languages&lt;/strong&gt;: Python, TypeScript, Go, Rust, C#, and others&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Frameworks&lt;/strong&gt;: React, FastAPI, ASP.NET, Django, and more&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Tool Integrations&lt;/strong&gt;: Docker, Terraform, Kubernetes, and additional tools&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Each module should include YAML frontmatter with &lt;code&gt;applyTo&lt;/code&gt; patterns and follow
+the conventions established in existing modules. See
+&lt;a class="link" href="https://github.com/tablackburn/ai-agent-instruction-modules/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener"
+&gt;CONTRIBUTING.md&lt;/a&gt;
+for detailed guidelines.&lt;/p&gt;
+&lt;h2 id="why-this-matters"&gt;Why This Matters
+&lt;/h2&gt;&lt;p&gt;As AI coding agents become more powerful and widely adopted, having consistent,
+well-documented instructions across your projects becomes critical. AIM
+eliminates the guesswork and provides a proven, tested foundation that you can
+build upon.&lt;/p&gt;
+&lt;p&gt;Whether you&amp;rsquo;re working alone or with a large team, across one project or dozens,
+AIM helps ensure your AI agents work effectively within your standards and
+practices.&lt;/p&gt;
+&lt;h2 id="get-started-today"&gt;Get Started Today
+&lt;/h2&gt;&lt;p&gt;Visit the &lt;a class="link" href="https://github.com/tablackburn/ai-agent-instruction-modules" target="_blank" rel="noopener"
+&gt;AIM Repository&lt;/a&gt;
+to get started. The project includes complete documentation, examples, and
+automated setup procedures.&lt;/p&gt;
+&lt;p&gt;Happy coding!&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;&lt;em&gt;P.S. — This blog post was written with the help of AI. As a result, it follows
+best practices, passes all linting rules, and was completed in a fraction of the
+time it would have taken manually. Ironic? Perhaps. Fitting? Absolutely.&lt;/em&gt;&lt;/p&gt;</description></item></channel></rss>
